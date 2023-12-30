@@ -1,6 +1,6 @@
 from .base import *
 
-DATABASE = {
+DATABASES = {
   "default": {
     "ENGINE": "django.db.backends.mysql",
     "NAME": "app",
