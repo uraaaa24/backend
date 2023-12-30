@@ -23,7 +23,7 @@
 				"pylint.args": [
 					"--load-plugins",
 					"pylint_django",
-					"--django-settins-module",
+					"--django-settings-module",
 					"config.settings.development"
 				]
 			}
