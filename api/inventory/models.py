@@ -7,8 +7,8 @@ class Product(models.Model):
   """
 
 	# 論理名 = models.フィールドの型(max_length=最大長, verbose_name=物理名)
-  name = models.CharFIeld(max_length=100, verbose_name="商品名")
-  price = models.IntegerFIeld(verbose_name="価格")
+  name = models.CharField(max_length=100, verbose_name="商品名")
+  price = models.IntegerField(verbose_name="価格")
   description = models.TextField(verbose_name="商品説明", null=True, blank=True)
 
   class Meta:
