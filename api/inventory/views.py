@@ -2,8 +2,10 @@ from django.db.models import F, Sum, Value
 from django.db.models.functions import Coalesce
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from api.inventory import serializers
 from api.inventory.exception import BusinessException
@@ -20,6 +22,9 @@ class ProductView(APIView):
     """
     商品操作に関する関数
     """
+
+    # 認証クラスの指定
+    authentication_classes = [JWTAuthentication]
 
     def get_object(self, pk):
         """
