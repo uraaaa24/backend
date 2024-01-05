@@ -1,11 +1,13 @@
-from django.db.models import F, Value
+from django.db.models import F, Sum, Value
+from django.db.models.functions import Coalesce
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.inventory import serializers
-from api.inventory.models import Product, Purchase
+from api.inventory.exception import BusinessException
+from api.inventory.models import Product, Purchase, Sales
 from api.inventory.serializers import (
     InventorySerializer,
     ProductSerializer,
@@ -94,6 +96,23 @@ class SalesView(APIView):
         """
         serializer = SalesSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        # 在庫が売る分の数量を超えないかチェック
+        # 在庫テーブルのレコードを取得
+        purchase = Purchase.objects.filter(
+            product_id=request.data["product"]
+        ).aaggregate(quantity_sum=Coalesce(Sum("quantity"), 0))
+        # 卸しテーブルのレコードを取得
+        sales = Sales.objects.filter(product_id=request.data["product"]).aaggregate(
+            quantity_sum=Coalesce(Sum("quantity"), 0)
+        )
+
+        #
+        if purchase["purchase_sum"] < sales["quantity_sum"] + int(
+            request.data["quantity"]
+        ):
+            raise BusinessException("在庫数量を超過することはできません")
+
         serializer.save()
         return Response(serializer.data, status.HTTP_201_CREATED)
 
