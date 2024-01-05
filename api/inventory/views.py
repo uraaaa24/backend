@@ -42,7 +42,7 @@ class ProductView(APIView):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data, status.HTTP_201_CREATED)
-  
+
   def put(self, request, id, format=None):
     """
     商品の情報を更新する
@@ -52,6 +52,14 @@ class ProductView(APIView):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data, status.HTTP_200_OK)
+
+  def delete(self, request, id, format=None):
+    """
+    商品を削除する
+    """
+    product = self.get_object(id)
+    product.delete()
+    return Response(status = status.HTTP_200_OK)
 
 
 class PurchaseView(APIView):
