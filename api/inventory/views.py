@@ -55,6 +55,9 @@ class ProductView(APIView):
 
 
 class PurchaseView(APIView):
+  """
+  仕入れ操作に関する関数
+  """
   def post(self, request, format=None):
     """
     仕入れ情報を登録する
@@ -66,6 +69,9 @@ class PurchaseView(APIView):
 
 
 class SalesView(APIView):
+  """
+  売上操作に関する関数
+  """
   def post(self, request, format=None):
     """
     売上情報を登録する
