@@ -25,12 +25,6 @@ class ProductView(APIView):
     商品操作に関する関数
     """
 
-    # 認証クラスの指定
-    authentication_classes = [JWTAuthentication]
-    # アクセス許可の指定
-    # 認証済みのリクエストのみ許可
-    permission_classes = [IsAuthenticated]
-
     def get_object(self, pk):
         """
         商品操作に関する関数で共通で使用する商品取得関数
@@ -193,5 +187,45 @@ class LoginView(APIView):
             response.set_cookie("refresh", refresh, httponly=True, max_age=max_age)
             return response
         return Response(
-            {"errorMassage", "ユーザーの認証に失敗しました"}, status=status.HTTP_401_UNAUTHORIZED
+            {"errMsg", "ユーザーの認証に失敗しました"}, status=status.HTTP_401_UNAUTHORIZED
         )
+
+
+class RetryView(APIView):
+    """
+    ユーザーのリトライ処理
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = []
+
+    def post(self, request):
+        request.data["refresh"] = request.META.get("HTTP_REFRESH_TOKEN")
+        serializer = TokenObtainPairSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        access = serializer.validated_data.get("access", None)
+        refresh = serializer.validated_data.get("refresh", None)
+        if access:
+            response = Response(status=status.HTTP_200_OK)
+            max_age = settings.COOKIE_TIME
+            response.set_cookie("access", access, httponly=True, max_age=max_age)
+            response.set_cookie("refresh", refresh, httponly=True, max_age=max_age)
+            return response
+        return Response(
+            {"errMsg", "ユーザーの認証に失敗しました"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+
+class LogoutView(APIView):
+    """
+    ユーザーのログアウト処理
+    """
+
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request, *args):
+        response = Response(status=status.HTTP_200_OK)
+        response.delete_cookie("access")
+        response.delete_cookie("refresh")
+        return response
