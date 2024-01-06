@@ -134,7 +134,7 @@ class InventoryView(APIView):
             # 件数が多くなるので商品IDは必ず指定する
             return Response(serializers.data, status.HTTP_400_BAD_REQUEST)
         else:
-            # UNIONするために、それぞれのフィールド名を再定義している
+            # UNIONするために、それぞれフィールド名を再定義している
             purchase = (
                 Purchase.objects.filter(product_id=id)
                 .prefetch_related("product")
@@ -147,7 +147,7 @@ class InventoryView(APIView):
                 )
             )
             sales = (
-                Purchase.objects.filter(product_id=id)
+                Sales.objects.filter(product_id=id)
                 .prefetch_related("product")
                 .values(
                     "id",
@@ -159,7 +159,7 @@ class InventoryView(APIView):
             )
             queryset = purchase.union(sales).order_by(F("date"))
             serializer = InventorySerializer(queryset, many=True)
-        return Response(serializer.date, status.HTTP_200_OK)
+            return Response(serializer.data, status.HTTP_200_OK)
 
 
 class LoginView(APIView):
@@ -176,6 +176,9 @@ class LoginView(APIView):
     permission_classes = []
 
     def post(self, request):
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        print(request)
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         serializer = TokenObtainPairSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         access = serializer.validated_data.get("access", None)
